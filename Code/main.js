@@ -1,4 +1,9 @@
 const myMap = new Map();
+const setType = new Set();
+
+// [...this] :  their data can be unpacked into distinct variables. => array
+Set.prototype.getByIndex = function(index) { return [...this][index]; }
+
 
 const cliType = {
     STRING: {
@@ -14,6 +19,8 @@ const cliType = {
         srem: 'srem',
         SMEMBERS: 'SMEMBERS',
         smembers: 'smembers',
+        SINTER: 'SINTER',
+        sinter: 'sinter',
     }
 }
 
@@ -74,6 +81,11 @@ function getInput(){
             ledisSMEMBERS(arrayCommand);
             break;
 
+        case cliType.SET.SINTER:
+        case cliType.SET.sinter:
+            ledisSINTER(arrayCommand);
+            break;
+
         case "":
             break;
 
@@ -114,7 +126,7 @@ function throwError(cause){
 }
 
 function ledisSET(arrayCommand) {
-    if (arrayCommand.length < 3){
+    if (arrayCommand.length != 3){
         throwError("wrong number of arguments for 'set' command");
         return;
     };
@@ -155,6 +167,11 @@ function ledisSADD(arrayCommand) {
 
     // Chưa có key này? => Thêm set mới
     if (!myMap.has(arrayCommand[1])){
+
+        // Thêm vào myMap có key = "setType" một value = const set chứa các keys của set
+        setType.add(arrayCommand[1]);
+        myMap.set("setType", setType);
+
         var countDataIn = 0;
         const newSet = new Set();
         for (var i = 2; i < arrayCommand.length ; i++){
@@ -172,6 +189,7 @@ function ledisSADD(arrayCommand) {
     }
 
     else {
+
         var countDataIn = myMap.get(arrayCommand[1]).size;
         for (var i = 2; i < arrayCommand.length ; i++){
             myMap.get(arrayCommand[1]).add(arrayCommand[i]);
@@ -237,9 +255,6 @@ function ledisSMEMBERS(arrayCommand) {
         var arrayMemberSet = [];
         var memberSet = myMap.get(arrayCommand[1]);
 
-        // [...this] :  their data can be unpacked into distinct variables. => array
-        Set.prototype.getByIndex = function(index) { return [...this][index]; }
-
         for (var i = 0; i < memberSet.size ; i++){
             arrayMemberSet.push(memberSet.getByIndex(i));
         }
@@ -249,4 +264,46 @@ function ledisSMEMBERS(arrayCommand) {
     }
 
     return;
+}
+
+function ledisSINTER(arrayCommand){
+
+    if (arrayCommand.length < 2){
+        throwError("wrong number of arguments for 'sinter' command");
+        return;
+    }
+
+    if (!myMap.has(arrayCommand[1])) { cliNormalReturn("(empty list or set)"); return;};
+    var minSetName = arrayCommand[1];
+
+    // get min size set
+    for (var i = 2; i < arrayCommand.length; i++){
+
+        if (!myMap.has(arrayCommand[i])){
+            cliNormalReturn("(empty list or set)");
+            return;
+        }
+
+        if (myMap.get(arrayCommand[i]).size < myMap.get(arrayCommand[i-1]).size){
+            minSetName = arrayCommand[i];
+        }
+    }
+
+    var minSet = myMap.get(minSetName);
+    var count = 0;
+    var arrayInter = [];
+    for (var i = 0; i < minSet.size ; i++){
+        for (var j = 1 ; j < arrayCommand.length ; j++){
+            console.log(minSet.getByIndex(i));
+            if (myMap.get(arrayCommand[j]).has(minSet.getByIndex(i))) {count++;}
+        }
+
+        if (count == arrayCommand.length - 1){
+            arrayInter.push(minSet.getByIndex(i));
+        }
+
+        count = 0;
+    }
+
+    cliListReturn(arrayInter);
 }

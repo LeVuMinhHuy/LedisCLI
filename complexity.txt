@@ -39,7 +39,7 @@ Access from HashMap : O(1)
 
 - Loop trong set có size bé nhất với số phần tử N (bé nhấ)t:
 - Với mỗi phần tử, loop lại M set: O(M)
-- Search trong set phần tử đó: O(1), nếu có tăng biết count lên 1.
+- Search trong các set phần tử đó: O(1), nếu có tăng biết count lên 1.
 - Kết thúc mỗi vòng loop M, so sánh biến count và M - 1, nếu count = M - 1, array push vào arrayOuput: O(1)
 
 => Tổng: O(M x N). Với M là số set input và N là số phần tử của set có size nhỏ nhất.
