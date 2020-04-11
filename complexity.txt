@@ -72,4 +72,9 @@ Access from HashMap : O(1)
 
 => O(1)
 
+11. Save:
+O(X) because I used localStorage.setItem()
 
+12. Restore:
+
+O(X) + O(M) + O(N) with O(X) is the complexity of localStorage.getItem(), M is numbers of myMap keys, N is number of activeExpire keys

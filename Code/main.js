@@ -39,7 +39,7 @@ const cliType = {
         TTL: 'TTL',
         ttl: 'ttl',
     },
-    SNAPSHOTS: {
+    SNAPSHOT: {
         SAVE: 'SAVE',
         save: 'save',
         RESTORE: 'RESTORE',
@@ -122,13 +122,13 @@ function getInput(){
             ledisTTL(arrayCommand);
             break;
 
-        case cliType.SNAPSHOTS.SAVE:
-        case cliType.SNAPSHOTS.save:
+        case cliType.SNAPSHOT.SAVE:
+        case cliType.SNAPSHOT.save:
             ledisSAVE(arrayCommand);
             break;
 
-        case cliType.SNAPSHOTS.RESTORE:
-        case cliType.SNAPSHOTS.restore:
+        case cliType.SNAPSHOT.RESTORE:
+        case cliType.SNAPSHOT.restore:
             ledisRESTORE(arrayCommand);
             break;
 
@@ -216,10 +216,7 @@ function ledisSET(arrayCommand) {
     myMap.set(arrayCommand[1], arrayCommand[2]);
     // Khi chưa expired mà set lại thì sẽ xóa thời gian expire
     if(activeExpire.has(arrayCommand[1])){
-        console.log(activeExpire);
         activeExpire.delete(arrayCommand[1]);
-        console.log(activeExpire);};
-
 
     cliNormalReturn("OK");
     return;
@@ -420,7 +417,7 @@ function ledisSINTER(arrayCommand){
 }
 
 function ledisKEYS(arrayCommand){
-    if (arrayCommand.length != 2){
+    if (arrayCommand.length != 1){
         throwError("wrong number of arguments for 'keys' command");
         return;
     }
@@ -577,7 +574,6 @@ function ledisSAVE(arrayCommand){
         return;
     }
 
-    hihi = {'1':'2','2':'3'};
     localStorage.setItem('myMap', JSON.stringify(Array.from(myMap.entries()))); // O(N)
     localStorage.setItem('activeExpire', JSON.stringify(Array.from(activeExpire.entries()))); // O(N)
 
