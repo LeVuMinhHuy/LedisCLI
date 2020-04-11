@@ -24,5 +24,5 @@ Is the place I introduce about the complexity of commands I have implemented.
 #### News.txt:
 These are my new discover about things that need attention during coding time. Which are also considered by my thought process.
 
-#### Datastructure.pdf: (Update soon)
+#### design.pdf:
 This is my design explanation.
