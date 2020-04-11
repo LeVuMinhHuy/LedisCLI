@@ -580,7 +580,8 @@ function ledisSAVE(arrayCommand){
     hihi = {'1':'2','2':'3'};
     localStorage.setItem('myMap', JSON.stringify(Array.from(myMap.entries()))); // O(N)
     localStorage.setItem('activeExpire', JSON.stringify(Array.from(activeExpire.entries()))); // O(N)
-    // throwError("Not implement yet !")
+
+    cliNormalReturn("OK");
 }
 
 function ledisRESTORE(arrayCommand){
@@ -607,7 +608,7 @@ function ledisRESTORE(arrayCommand){
 
     // => O(M) + O(N)
 
-    // throwError("Not implement yet !")
+    cliNormalReturn("OK");
 }
 
 function ledisFLUSHALL(){
