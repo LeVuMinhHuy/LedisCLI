@@ -1,6 +1,9 @@
-const myMap = new Map();
-const setType = new Set();
-const activeExpire = new Map();
+// Init
+var myMap = new Map();
+var setType = new Set();
+var activeExpire = new Map();
+
+// const testMap = localStorage.getItem('myMap');
 
 const timer = {};
 const newExpire = {};
@@ -117,6 +120,20 @@ function getInput(){
         case cliType.EXPIRE.TTL:
         case cliType.EXPIRE.ttl:
             ledisTTL(arrayCommand);
+            break;
+
+        case cliType.SNAPSHOTS.SAVE:
+        case cliType.SNAPSHOTS.save:
+            ledisSAVE(arrayCommand);
+            break;
+
+        case cliType.SNAPSHOTS.RESTORE:
+        case cliType.SNAPSHOTS.restore:
+            ledisRESTORE(arrayCommand);
+            break;
+
+        case "flushall":
+            ledisFLUSHALL();
             break;
 
         case "clear":
@@ -552,6 +569,50 @@ function ledisTTL(arrayCommand){
         cliNormalReturn("(integer) " + activeExpire.get(arrayCommand[1]));
     }
 
+}
+
+function ledisSAVE(arrayCommand){
+    if (arrayCommand.length != 1){
+        throwError("wrong number of arguments for 'save' command");
+        return;
+    }
+
+    hihi = {'1':'2','2':'3'};
+    localStorage.setItem('myMap', JSON.stringify(Array.from(myMap.entries()))); // O(N)
+    localStorage.setItem('activeExpire', JSON.stringify(Array.from(activeExpire.entries()))); // O(N)
+    // throwError("Not implement yet !")
+}
+
+function ledisRESTORE(arrayCommand){
+    if (arrayCommand.length != 1){
+        throwError("wrong number of arguments for 'restore' command");
+        return;
+    }
+
+    cacheMap = JSON.parse(localStorage.getItem('myMap'));
+    cacheActiveExpire = JSON.parse(localStorage.getItem('activeExpire'));
+
+    myMap = new Map();
+    activeExpire = new Map();
+
+    //O(M) for for loop with M is keys saved
+    for (var i = 0 ; i < cacheMap.length ; i++){
+        myMap.set(cacheMap[i][0], cacheMap[i][1]); // O(1)
+    }
+
+    //O(N) for for loop with N is keys expiring
+    for (var i = 0 ; i < cacheActiveExpire.length ; i++){
+        activeExpire.set(cacheActiveExpire[i][0], cacheActiveExpire[i][1]); // O(1)
+    }
+
+    // => O(M) + O(N)
+
+    // throwError("Not implement yet !")
+}
+
+function ledisFLUSHALL(){
+    myMap = new Map();
+    activeExpire = new Map();
 }
 
 function ledisCLEAR(){
