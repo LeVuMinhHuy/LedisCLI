@@ -217,6 +217,7 @@ function ledisSET(arrayCommand) {
     // Khi chưa expired mà set lại thì sẽ xóa thời gian expire
     if(activeExpire.has(arrayCommand[1])){
         activeExpire.delete(arrayCommand[1]);
+    }
 
     cliNormalReturn("OK");
     return;
