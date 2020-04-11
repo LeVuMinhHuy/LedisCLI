@@ -1,0 +1,31 @@
+1/
+
+127.0.0.1:6379> set hello world
+OK
+127.0.0.1:6379> sadd hi 1 2 3
+(integer) 3
+127.0.0.1:6379> keys *
+1) "hello"
+2) "hi"
+127.0.0.1:6379> get hi
+(error) WRONGTYPE Operation against a key holding the wrong kind of value
+
+=> keys của string type và set type không giống nhau
+**từ string->set không được, nhưng ngược lại thì được**
+không get được set type
+
+https://dba.stackexchange.com/questions/96795/redis-newbie-how-to-create-hash-within-a-hash
+
+Redis doesn't support nested data structures, and specifically it doesn't support a Hash inside a Hash :) You basically have a choice between two options: either serialize the internal Hash and store it in a Hash field or use another Hash key and just keep a reference to it in a field of the outer Hash.
+
+2/ switch (string) case => switch (enum) case
+
+3/ string " " = ""
+
+4/ set hello        (many space)
+=> Wrong
+=> Not: get hello => ""
+
+5/ Vì chỉ có 2 kiểu string và set nên => xét != string => set
+
+6/ The Array.push runtime is a O(1)

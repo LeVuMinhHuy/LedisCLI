@@ -1,0 +1,6 @@
+1. Find out what redis is?
+- I watched the first link when googled it : https://www.youtube.com/watch?v=Hbt56gFj998
+- Then install redis server, try some command in my terminal about GET/SET string; EXPIRE, TTL.
+- https://stackoverflow.com/questions/9625246/what-are-the-underlying-data-structures-used-for-redis
+For the answer of Antirez about "What are the underlying data structures used for Redis?"
+
