@@ -53,11 +53,23 @@ Access from HashMap : O(1)
 => O(N)
 
 8. Del:
+- Search in hashmap: O(1)
 - Delete an element from hashmap : O(1)
 - Delete an element from set: O(1)
 
 => O(1) for each element.
 
-9. 
+9. Expire:
+- Search in hashmap: O(1)
+- Insert into activeExpire hashmap: O(1)
+
+=> O(1)
+
+10. Ttl:
+- Search in hashmap: O(1)
+- Search in activeExpire hashmap: O(1)
+- Access from hashmap: O(1)
+
+=> O(1)
 
 

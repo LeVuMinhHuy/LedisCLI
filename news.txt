@@ -29,3 +29,12 @@ Redis doesn't support nested data structures, and specifically it doesn't suppor
 5/ Vì chỉ có 2 kiểu string và set nên => xét != string => set
 
 6/ The Array.push runtime is a O(1)
+
+7/ Active Expire and Passive Expire :
+AE: 
+khi enter đều check timeout => hết thì xóa : cho tất cả các cliType (từ set/get -> save) 
+
+check timeout : O(1) vì check theo tên trong hash
+
+8/ Khi set sẽ xóa time countdown của biến đang expire
+

@@ -1,5 +1,9 @@
 const myMap = new Map();
 const setType = new Set();
+const activeExpire = new Map();
+
+const timer = {};
+const newExpire = {};
 
 // [...this] :  their data can be unpacked into distinct variables. => array
 Set.prototype.getByIndex = function(index) { return [...this][index]; }
@@ -66,7 +70,6 @@ function getInput(){
 
 
     switch(arrayCommand[0]){
-        // =================== SET / GET =================== //
         case cliType.STRING.SET:
         case cliType.STRING.set:
             ledisSET(arrayCommand);
@@ -77,21 +80,16 @@ function getInput(){
             ledisGET(arrayCommand);
             break;
 
-        // ================= SADD ================= //
-
         case cliType.SET.SADD:
         case cliType.SET.sadd:
             ledisSADD(arrayCommand);
             break;
-
-        //=================== SREM ==================//
 
         case cliType.SET.SREM:
         case cliType.SET.srem:
             ledisSREM(arrayCommand);
             break;
 
-        //================= SMEMBERS ==================//
         case cliType.SET.SMEMBERS:
         case cliType.SET.smembers:
             ledisSMEMBERS(arrayCommand);
@@ -111,6 +109,20 @@ function getInput(){
             ledisDEL(arrayCommand);
             break;
 
+        case cliType.EXPIRE.EXPIRE:
+        case cliType.EXPIRE.expire:
+            ledisEXPIRE(arrayCommand);
+            break;
+
+        case cliType.EXPIRE.TTL:
+        case cliType.EXPIRE.ttl:
+            ledisTTL(arrayCommand);
+            break;
+
+        case "clear":
+            ledisCLEAR();
+            break;
+
         case "":
             break;
 
@@ -120,6 +132,7 @@ function getInput(){
 
     return 0;
 }
+
 
 function addLine(command) {
     var r = document.getElementById("consoletext");
@@ -150,17 +163,46 @@ function throwError(cause){
     r.innerHTML += cause;
 }
 
+function checkTimeout(variable){
+    if (myMap.has(variable) && activeExpire.has(variable) && activeExpire.get(variable) == -1){
+        myMap.delete(variable);
+        activeExpire.delete(variable);
+        cliNormalReturn("(nil)");
+        return 1;
+    }
+
+    return 0;
+}
+
+function checkManyTimeout(variable){
+    if (myMap.has(variable) && activeExpire.has(variable) && activeExpire.get(variable) == -1){
+        myMap.delete(variable);
+        activeExpire.delete(variable);
+        // cliNormalReturn("(nil)");
+        return 1;
+    }
+
+    return 0;
+}
+
 function ledisSET(arrayCommand) {
     if (arrayCommand.length != 3){
         throwError("wrong number of arguments for 'set' command");
         return;
     };
 
+    checkTimeout(arrayCommand[1]);
     // Set lại một setType vẫn được.
     // Ví dụ:
     // sadd a 1 2 3 4
     // set a b
     myMap.set(arrayCommand[1], arrayCommand[2]);
+    // Khi chưa expired mà set lại thì sẽ xóa thời gian expire
+    if(activeExpire.has(arrayCommand[1])){
+        console.log(activeExpire);
+        activeExpire.delete(arrayCommand[1]);
+        console.log(activeExpire);};
+
 
     cliNormalReturn("OK");
     return;
@@ -171,6 +213,14 @@ function ledisGET(arrayCommand) {
         throwError("wrong number of arguments for 'get' command");
         return;
     }
+
+    if (!myMap.has(arrayCommand[1])){
+        cliNormalReturn("(nil)");
+        return;
+    }
+
+    if(checkTimeout(arrayCommand[1]) == 1){return;};
+
     // Không thể  get một setType
     if(typeof myMap.get(arrayCommand[1]) != "string" ){
         throwError("WRONGTYPE Operation against a key holding the wrong kind of value");
@@ -189,6 +239,8 @@ function ledisSADD(arrayCommand) {
         throwError("wrong number of arguments for 'sadd' command");
         return;
     }
+
+    if(checkTimeout(arrayCommand[1]) == 1){return;};
 
     // Chưa có key này? => Thêm set mới
     if (!myMap.has(arrayCommand[1])){
@@ -235,6 +287,8 @@ function ledisSREM(arrayCommand) {
         return;
     }
 
+    if(checkTimeout(arrayCommand[1]) == 1){return;};
+
     // Xóa một set chưa tồn tại, vân trả về cli là integer 0
     if (!myMap.has(arrayCommand[1])){
         cliNormalReturn("(integer) " + 0);
@@ -267,6 +321,8 @@ function ledisSMEMBERS(arrayCommand) {
         throwError("wrong number of arguments for 'smembers' command");
         return;
     }
+
+    if(checkTimeout(arrayCommand[1]) == 1){return;};
 
     if (!myMap.has(arrayCommand[1])){
         cliNormalReturn("(empty list or set)");
@@ -302,9 +358,11 @@ function ledisSINTER(arrayCommand){
         if (!myMap.has("setType")){cliNormalReturn("(empty list or set)"); return;};
 
         for (var i = 0 ; i < myMap.get("setType").size ; i++){
+            checkManyTimeout(arrayCommand[i+1]);
             arrayCommand[i+1] = myMap.get("setType").getByIndex(i);
         }
     };
+
     // console.log(arrayCommand);
 
     if (!myMap.has(arrayCommand[1])) { cliNormalReturn("(empty list or set)"); return;};
@@ -312,6 +370,8 @@ function ledisSINTER(arrayCommand){
 
     // get min size set
     for (var i = 2; i < arrayCommand.length; i++){
+
+        checkManyTimeout(arrayCommand[i]);
 
         if (!myMap.has(arrayCommand[i])){
             cliNormalReturn("(empty list or set)");
@@ -349,6 +409,13 @@ function ledisKEYS(arrayCommand){
     }
 
     var allKeys = Array.from(myMap.keys()); // O(N)
+
+    for (var i = 0 ; i < allKeys.length ; i++){
+        checkManyTimeout(allKeys[i]);
+    }
+
+    var allKeys = Array.from(myMap.keys());
+
     var arrayKeysOut = [];
 
     for (var i = 0 ; i < allKeys.length ; i++){
@@ -370,10 +437,17 @@ function ledisDEL(arrayCommand){
         return;
     }
 
+    // var allKeys = Array.from(myMap.keys()); // O(N)
+
+    // for (var i = 0 ; i < allKeys.length ; i++){
+    //     checkManyTimeout(allKeys[i]);
+    // }
+
     // O(N)
     if (arrayCommand[1] == "*"){
-        var allKeys = Array.from(myMap.keys()); // O(N)
         var arrayKeysOut = [];
+
+        var allKeys = Array.from(myMap.keys());
 
         for (var i = 0 ; i < allKeys.length ; i++){
             if (allKeys[i] != "setType"){
@@ -394,10 +468,93 @@ function ledisDEL(arrayCommand){
         }
 
         myMap.delete(arrayCommand[i]);
-        if(myMap.get("setType").has(arrayCommand[i])){myMap.get("setType").delete(arrayCommand[i])}
+        if(activeExpire.has(arrayCommand[i])){activeExpire.delete(arrayCommand[i])};
+
+        if(myMap.has("setType")){
+            if(myMap.get("setType").has(arrayCommand[i])){myMap.get("setType").delete(arrayCommand[i])};
+        }
+
 
         countDelete++;
     }
 
     cliNormalReturn("(integer) " + countDelete);
+}
+
+function ledisEXPIRE(arrayCommand){
+    if (arrayCommand.length != 3){
+        throwError("wrong number of arguments for 'expire' command");
+        return;
+    }
+
+    if(checkTimeout(arrayCommand[1]) == 1){return;};
+
+    if (!myMap.has(arrayCommand[1])){
+        cliNormalReturn("(integer) " + 0);
+        return;
+    }
+
+    // const timer = {};
+    // const newExpire = {};
+
+    // Xóa expire cũ
+    if(activeExpire.has(arrayCommand[1])){
+        clearInterval(newExpire[arrayCommand[1]]);
+        activeExpire.delete(arrayCommand[1]);
+    };
+
+    // Nhiều Expire cùng lúc
+
+    timer[arrayCommand[1]] = arrayCommand[2];
+    activeExpire.set(arrayCommand[1], timer[arrayCommand[1]]);
+
+
+    newExpire[arrayCommand[1]] = setInterval(function(){
+
+        if (timer[arrayCommand[1]] == -1) {
+            clearInterval(newExpire[arrayCommand[1]]);
+            return;
+        };
+
+        timer[arrayCommand[1]] -= 1;
+        if(activeExpire.has(arrayCommand[1])){
+            activeExpire.set(arrayCommand[1], timer[arrayCommand[1]]);
+        }
+        else{
+            return;
+        }
+
+        // console.log(timer);
+        console.log(activeExpire);
+
+    } , 1000)
+
+    cliNormalReturn("(integer) " + 1);
+}
+
+function ledisTTL(arrayCommand){
+    if (arrayCommand.length != 2){
+        throwError("wrong number of arguments for 'expire' command");
+        return;
+    }
+
+    if (!myMap.has(arrayCommand[1])){
+        cliNormalReturn("(integer) " + -2);
+        return;
+    }
+
+    checkManyTimeout(arrayCommand[1]);
+
+    if (!activeExpire.has(arrayCommand[1])){
+        cliNormalReturn("(integer) " + -1);
+    }
+    else{
+        cliNormalReturn("(integer) " + activeExpire.get(arrayCommand[1]));
+    }
+
+}
+
+function ledisCLEAR(){
+    var r = document.getElementById("consoletext");
+    r.innerHTML = "Ledis : Le Vu Minh Huy <br> <br>";
 }
