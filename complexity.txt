@@ -46,3 +46,18 @@ Access from HashMap : O(1)
 
 Đặc biệt: Nếu SINTER *, sẽ loop in set.size với set đó là value của key: "setType" từ myMap HashMap. Mục đích để chỉ là O(S) với S là number of sets, chứ không phải O(K) với K là toàn bộ keys. 
 
+7. Keys:
+- Convert to array from all keys in HashMap: O(N)
+- Loop that array and array push (O(1)): O(N)
+
+=> O(N)
+
+8. Del:
+- Delete an element from hashmap : O(1)
+- Delete an element from set: O(1)
+
+=> O(1) for each element.
+
+9. 
+
+

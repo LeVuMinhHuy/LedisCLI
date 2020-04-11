@@ -21,6 +21,22 @@ const cliType = {
         smembers: 'smembers',
         SINTER: 'SINTER',
         sinter: 'sinter',
+    },
+    EXPIRE: {
+        KEYS: 'KEYS',
+        keys: 'keys',
+        DEL: 'DEL',
+        del: 'del',
+        EXPIRE: 'EXPIRE',
+        expire: 'expire',
+        TTL: 'TTL',
+        ttl: 'ttl',
+    },
+    SNAPSHOTS: {
+        SAVE: 'SAVE',
+        save: 'save',
+        RESTORE: 'RESTORE',
+        restore: 'restore',
     }
 }
 
@@ -84,6 +100,15 @@ function getInput(){
         case cliType.SET.SINTER:
         case cliType.SET.sinter:
             ledisSINTER(arrayCommand);
+            break;
+        case cliType.EXPIRE.KEYS:
+        case cliType.EXPIRE.keys:
+            ledisKEYS(arrayCommand);
+            break;
+
+        case cliType.EXPIRE.DEL:
+        case cliType.EXPIRE.del:
+            ledisDEL(arrayCommand);
             break;
 
         case "":
@@ -273,6 +298,15 @@ function ledisSINTER(arrayCommand){
         return;
     }
 
+    if (arrayCommand[1] == "*"){
+        if (!myMap.has("setType")){cliNormalReturn("(empty list or set)"); return;};
+
+        for (var i = 0 ; i < myMap.get("setType").size ; i++){
+            arrayCommand[i+1] = myMap.get("setType").getByIndex(i);
+        }
+    };
+    // console.log(arrayCommand);
+
     if (!myMap.has(arrayCommand[1])) { cliNormalReturn("(empty list or set)"); return;};
     var minSetName = arrayCommand[1];
 
@@ -294,7 +328,6 @@ function ledisSINTER(arrayCommand){
     var arrayInter = [];
     for (var i = 0; i < minSet.size ; i++){
         for (var j = 1 ; j < arrayCommand.length ; j++){
-            console.log(minSet.getByIndex(i));
             if (myMap.get(arrayCommand[j]).has(minSet.getByIndex(i))) {count++;}
         }
 
@@ -304,6 +337,67 @@ function ledisSINTER(arrayCommand){
 
         count = 0;
     }
+    if (arrayInter.length == 0){ cliNormalReturn("(empty list or set)"); return;}
 
     cliListReturn(arrayInter);
+}
+
+function ledisKEYS(arrayCommand){
+    if (arrayCommand.length != 2){
+        throwError("wrong number of arguments for 'keys' command");
+        return;
+    }
+
+    var allKeys = Array.from(myMap.keys()); // O(N)
+    var arrayKeysOut = [];
+
+    for (var i = 0 ; i < allKeys.length ; i++){
+        if (allKeys[i] != "setType"){
+            arrayKeysOut.push(allKeys[i]); // O(1)
+        }
+    }
+    // for: O(N)
+
+    if (arrayKeysOut.length == 0){ cliNormalReturn("(empty list or set)"); return;}
+
+    cliListReturn(arrayKeysOut);
+
+}
+
+function ledisDEL(arrayCommand){
+    if (arrayCommand.length < 2){
+        throwError("wrong number of arguments for 'del' command");
+        return;
+    }
+
+    // O(N)
+    if (arrayCommand[1] == "*"){
+        var allKeys = Array.from(myMap.keys()); // O(N)
+        var arrayKeysOut = [];
+
+        for (var i = 0 ; i < allKeys.length ; i++){
+            if (allKeys[i] != "setType"){
+                arrayKeysOut.push(allKeys[i]); // O(1)
+            }
+        }
+
+        for (var i = 0 ; i < arrayKeysOut.length ; i++){
+            arrayCommand[i+1] = arrayKeysOut[i];
+        }
+    };
+
+    var countDelete = 0;
+    for (var i = 1; i < arrayCommand.length; i++){
+
+        if (!myMap.has(arrayCommand[i])){
+            continue;
+        }
+
+        myMap.delete(arrayCommand[i]);
+        if(myMap.get("setType").has(arrayCommand[i])){myMap.get("setType").delete(arrayCommand[i])}
+
+        countDelete++;
+    }
+
+    cliNormalReturn("(integer) " + countDelete);
 }
