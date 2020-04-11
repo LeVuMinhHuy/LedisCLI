@@ -13,7 +13,9 @@ Again, this is a simple css file to initialize background color and text color
 This is the most important file, all the implementation of the database structure and the handling is done here.
 I will describe the data structure and its handling in specific files below
 
-And one `index.html` file outside. 1. This is just a very small html file, used to display web pages by integrating `main.css` and `main javascript`.
+And one `index.html` file outside. This is just a very small html file, used to display web pages by integrating `main.css` and `main javascript`.
+#### design.pdf:
+An important one. This is my design explanation.
 
 #### Pictures:
 In folder `Pics`, I keep screenshots of many examples about my commands
@@ -24,5 +26,3 @@ Is the place I introduce about the complexity of commands I have implemented.
 #### News.txt:
 These are my new discover about things that need attention during coding time. Which are also considered by my thought process.
 
-#### design.pdf:
-This is my design explanation.
