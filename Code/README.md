@@ -1,0 +1,28 @@
+## Ledis
+
+### Introduce:
+This product is written primarily based on the javascript language, the data structure is implemented based on this language. I also use some html and css to display CLI on my website.
+![What it looks like](../Pics/hello.png)
+
+### About my submission:
+#### Source:
+What I have coded are in `Code` folder. They includes 3 files:
+1. `index.html`:
+This is just a very small html file, used to display web pages by integrating `main.css` and `main.javascript`.
+2. `main.css`:
+Again, this is a simple css file to initialize background color and text color
+3. `main.js`:
+This is the most important file, all the implementation of the database structure and the handling is done here.
+I will describe the data structure and its handling in specific files below
+
+### Pictures:
+In folder `Pics`, I keep screenshots of many examples about my commands
+
+### Complexity.txt:
+Is the place I introduce about the complexity of commands I have implemented.
+
+### News.txt:
+These are my new discover about things that need attention during coding time. Which are also considered by my thought process.
+
+### Datastructure.pdf: (Update soon)
+This is my design explanation.
