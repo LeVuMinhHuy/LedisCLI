@@ -603,7 +603,15 @@ function ledisRESTORE(arrayCommand){
         activeExpire.set(cacheActiveExpire[i][0], cacheActiveExpire[i][1]); // O(1)
     }
 
-    // => O(M) + O(N)
+    const entriesActiveExpire = activeExpire.entries();  //O(N)
+
+    //O(N)
+    for (var i = 0 ; i < activeExpire.size ; i++){
+        var newEntry = entriesActiveExpire.next().value;
+        var newArrayCommand = [0, newEntry[0], newEntry[1]];
+        ledisEXPIRE(newArrayCommand);
+    }
+    // => O(M) + O(3N)
 
     cliNormalReturn("OK");
 }
