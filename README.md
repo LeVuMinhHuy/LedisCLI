@@ -8,14 +8,14 @@ This product is written primarily in javascript language, the data structure is 
 #### Source:
 What I have coded are in `Code` folder. They includes 2 files:
 1. `main.css`:
-Again, this is a simple css file to initialize background color and text color
+This is a simple css file to initialize background color and text color
 2. `main.js`:
 This is the most important file, all the implementation of the database structure and the handling is done here.
 I will describe the data structure and its handling in specific files below
 
 And one `index.html` file outside. This is just a very small html file, used to display web pages by integrating `main.css` and `main.js`.
 #### design.pdf:
-An important one. This is my design explanation.
+An important one! This is my design explanation.
 
 #### Pictures:
 In folder `Pics`, I keep screenshots of many examples about my commands
